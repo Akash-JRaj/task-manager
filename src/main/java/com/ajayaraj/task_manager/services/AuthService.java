@@ -1,6 +1,6 @@
 package com.ajayaraj.task_manager.services;
 
-import com.ajayaraj.task_manager.config.JwtUtil;
+import com.ajayaraj.task_manager.utilis.JwtUtil;
 import com.ajayaraj.task_manager.dtos.LoginRequest;
 import com.ajayaraj.task_manager.models.User;
 import com.ajayaraj.task_manager.repos.AuthRepo;
@@ -28,6 +28,9 @@ public class AuthService {
         return jwtUtil.generateJwtToken(loginRequest.getUserName());
     }
 
+    public User getByUserName(String userName) {
+        return authRepo.findByUserName(userName);
+    }
 
     public boolean isUserNameTaken(String userName) {
         return authRepo.findByUserName(userName) != null;
