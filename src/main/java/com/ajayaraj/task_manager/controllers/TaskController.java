@@ -29,12 +29,21 @@ public class TaskController {
     }
 
     @GetMapping("/{taskId}")
-    public ResponseEntity<TaskDto> getTaskByTaskId(@PathVariable UUID taskId) {
+    public ResponseEntity<Task> getTaskByTaskId(@PathVariable UUID taskId) {
         if(!taskService.isCurrentUserIsTheOwnerOfTask(taskId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(taskService.getTaskByTaskId(taskId));
+    }
+
+    @PutMapping
+    public ResponseEntity<Task> updateTask(@RequestBody Task task) {
+        if(!taskService.isCurrentUserIsTheOwnerOfTask(task.getId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(task));
     }
 
 }
