@@ -29,6 +29,10 @@ public class TaskService {
         return taskRepo.save(task);
     }
 
+    public Task updateTask(Task task) {
+        return taskRepo.save(task);
+    }
+
     public List<Task> getTasks() {
         String userName  = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);
@@ -38,16 +42,15 @@ public class TaskService {
         return tasks;
     }
 
-    public TaskDto getTaskByTaskId(UUID taskId) {
-        Task task = taskRepo.getReferenceById(taskId);
-        return new TaskDto(task.getId(), task.getTaskName(), task.getDescription(), task.getUserId());
+    public Task getTaskByTaskId(UUID taskId) {
+        return taskRepo.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found!"));
     }
 
     public boolean isCurrentUserIsTheOwnerOfTask(UUID taskId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);
 
-        Task task = taskRepo.getReferenceById(taskId);
+        Task task = taskRepo.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found!"));
 
         UUID userId = user.getId();
         UUID taskUserId = task.getUserId();
