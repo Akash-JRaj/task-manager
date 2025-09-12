@@ -67,6 +67,19 @@ public class TaskService {
         taskRepo.delete(task);
     }
 
+    public Task updateComplete(UUID taskId) {
+        Task task = taskRepo.findById(taskId).orElseThrow(
+                () -> new TaskNotFoundException("Task with id : " + taskId + " not found!")
+        );
+
+        if(!isCurrentUserIsTheOwnerOfTask(taskId)) {
+            throw new AccessDeniedException("Not your task to delete!");
+        }
+
+        task.setCompleted(!task.isCompleted());
+        return taskRepo.save(task);
+    }
+
     public boolean isCurrentUserIsTheOwnerOfTask(UUID taskId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);

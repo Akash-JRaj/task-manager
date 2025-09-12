@@ -37,6 +37,11 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(task));
     }
 
+    @PutMapping("/{taskId}/complete")
+    public ResponseEntity<Task> updateCompleteStatus(@PathVariable UUID taskId) {
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.updateComplete(taskId));
+    }
+
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID taskId) {
 
