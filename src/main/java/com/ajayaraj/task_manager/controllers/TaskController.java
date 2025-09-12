@@ -1,6 +1,5 @@
 package com.ajayaraj.task_manager.controllers;
 
-import com.ajayaraj.task_manager.dtos.TaskDto;
 import com.ajayaraj.task_manager.models.Task;
 import com.ajayaraj.task_manager.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,20 +29,20 @@ public class TaskController {
 
     @GetMapping("/{taskId}")
     public ResponseEntity<Task> getTaskByTaskId(@PathVariable UUID taskId) {
-        if(!taskService.isCurrentUserIsTheOwnerOfTask(taskId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         return ResponseEntity.status(HttpStatus.OK).body(taskService.getTaskByTaskId(taskId));
     }
 
     @PutMapping
     public ResponseEntity<Task> updateTask(@RequestBody Task task) {
-        if(!taskService.isCurrentUserIsTheOwnerOfTask(task.getId())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(task));
+    }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable UUID taskId) {
+
+        taskService.deleteTaskByTaskId(taskId);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

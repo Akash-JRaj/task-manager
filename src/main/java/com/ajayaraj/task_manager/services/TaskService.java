@@ -1,6 +1,7 @@
 package com.ajayaraj.task_manager.services;
 
-import com.ajayaraj.task_manager.dtos.TaskDto;
+import com.ajayaraj.task_manager.exceptions.AccessDeniedException;
+import com.ajayaraj.task_manager.exceptions.TaskNotFoundException;
 import com.ajayaraj.task_manager.models.Task;
 import com.ajayaraj.task_manager.models.User;
 import com.ajayaraj.task_manager.repos.AuthRepo;
@@ -30,6 +31,10 @@ public class TaskService {
     }
 
     public Task updateTask(Task task) {
+        if(!isCurrentUserIsTheOwnerOfTask(task.getId())) {
+            throw new AccessDeniedException("Not your task to update!");
+        }
+
         return taskRepo.save(task);
     }
 
@@ -37,20 +42,38 @@ public class TaskService {
         String userName  = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);
 
-        List<Task> tasks = taskRepo.findByUserId(user.getId());
-
-        return tasks;
+        return taskRepo.findByUserId(user.getId());
     }
 
     public Task getTaskByTaskId(UUID taskId) {
-        return taskRepo.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found!"));
+        if(!isCurrentUserIsTheOwnerOfTask(taskId)) {
+            throw new AccessDeniedException("Not your task!");
+        }
+
+        return taskRepo.findById(taskId).orElseThrow(
+                () -> new TaskNotFoundException("Task with id : " + taskId + " not found!")
+        );
+    }
+
+    public void deleteTaskByTaskId(UUID taskId) {
+        Task task = taskRepo.findById(taskId).orElseThrow(
+                () -> new TaskNotFoundException("Task with id : " + taskId + " not found!")
+        );
+
+        if(!isCurrentUserIsTheOwnerOfTask(taskId)) {
+            throw new AccessDeniedException("Not your task to delete!");
+        }
+
+        taskRepo.delete(task);
     }
 
     public boolean isCurrentUserIsTheOwnerOfTask(UUID taskId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);
 
-        Task task = taskRepo.findById(taskId).orElseThrow(() -> new RuntimeException("Task not found!"));
+        Task task = taskRepo.findById(taskId).orElseThrow(
+                () -> new TaskNotFoundException("Task with id : " + taskId + " not found!")
+        );
 
         UUID userId = user.getId();
         UUID taskUserId = task.getUserId();
