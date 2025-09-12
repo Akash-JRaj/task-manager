@@ -7,6 +7,8 @@ import com.ajayaraj.task_manager.models.User;
 import com.ajayaraj.task_manager.repos.AuthRepo;
 import com.ajayaraj.task_manager.repos.TaskRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -38,7 +40,14 @@ public class TaskService {
         return taskRepo.save(task);
     }
 
-    public List<Task> getTasks() {
+    public Page<Task> getTasks(Pageable pageable) {
+        String userName  = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = authRepo.findByUserName(userName);
+
+        return taskRepo.findByUserId(user.getId(), pageable);
+    }
+
+    public List<Task> getAllTasks() {
         String userName  = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);
 
