@@ -3,6 +3,10 @@ package com.ajayaraj.task_manager.controllers;
 import com.ajayaraj.task_manager.models.Task;
 import com.ajayaraj.task_manager.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +27,14 @@ public class TaskController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Task>> getTasks() {
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasks());
+    public ResponseEntity<Page<Task>> getTasks(@RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "10") int size,
+                                               @RequestParam(defaultValue = "taskName") String sortBy,
+                                               @RequestParam(defaultValue = "true") boolean ascending) {
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasks(pageable));
     }
 
     @GetMapping("/{taskId}")
@@ -56,7 +66,7 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasksByCompletionStatus(status));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasks());
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.getAllTasks());
     }
 
 }
