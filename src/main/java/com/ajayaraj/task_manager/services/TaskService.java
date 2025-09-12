@@ -80,6 +80,13 @@ public class TaskService {
         return taskRepo.save(task);
     }
 
+    public List<Task> getTasksByCompletionStatus(Boolean completed) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        User currentUser = authRepo.findByUserName(userName);
+
+        return taskRepo.findByUserIdAndCompletionStatus(currentUser.getId(), completed);
+    }
+
     public boolean isCurrentUserIsTheOwnerOfTask(UUID taskId) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = authRepo.findByUserName(userName);

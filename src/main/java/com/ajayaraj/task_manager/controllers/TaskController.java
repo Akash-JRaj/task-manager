@@ -50,4 +50,13 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Task>> filterByCompletionStatus(@RequestParam(value = "status", required = false) Boolean status) {
+        if(status != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasksByCompletionStatus(status));
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.getTasks());
+    }
+
 }
